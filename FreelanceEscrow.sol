@@ -375,6 +375,31 @@ contract FreelanceEscrow {
     function getContractBalance() external view returns (uint256) {
         return address(this).balance;
     }
+
+        // Freelancer can view available jobs assigned to them but not accepted yet
+    function getPendingJobsForFreelancer(address _freelancer) external view returns (uint256[] memory) {
+        uint256[] memory allJobs = freelancerJobs[_freelancer];
+        uint256 count = 0;
+
+        // First pass to count pending jobs
+        for (uint256 i = 0; i < allJobs.length; i++) {
+            if (jobs[allJobs[i]].status == JobStatus.Open) {
+                count++;
+            }
+        }
+
+        // Second pass to collect job IDs
+        uint256[] memory pending = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < allJobs.length; i++) {
+            if (jobs[allJobs[i]].status == JobStatus.Open) {
+                pending[index++] = allJobs[i];
+            }
+        }
+
+        return pending;
+    }
+
     
     // ============ Emergency Functions ============
     
